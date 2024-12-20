@@ -31,14 +31,20 @@ export class LoginComponent implements OnInit {
       .post<any>(`${environment.backendUrl}/login`, userCredentials)
       .subscribe({
         next: (response) => {
-          sessionStorage.setItem(
-            'user',
-            JSON.stringify({
+          try {
+            const userData = {
               email: this.enteredEmail,
               role: response.role,
-            })
-          );
-          sessionStorage.setItem('isLoggedIn', 'true');
+            };
+            sessionStorage.setItem('user', JSON.stringify(userData));
+            sessionStorage.setItem('isLoggedIn', 'true');
+          } catch (e) {
+            console.error('Failed to save to session storage', e);
+            this.errorMessage =
+              'An error occurred while storing session data. Please try again.';
+            return;
+          }
+
           if (response.role === 'admin') {
             window.location.href = '/userAdmin';
           } else {

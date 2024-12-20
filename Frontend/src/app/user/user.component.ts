@@ -15,20 +15,37 @@ export class UserComponent {
   errorMessage: string | null = null;
   enteredNewPassword = '';
   enteredConfirmedNewPassword = '';
-  loggedInUser = sessionStorage.getItem('user');
-  userEmail = this.loggedInUser ? JSON.parse(this.loggedInUser).email : null;
-  storedLoginStatus = sessionStorage.getItem('isLoggedIn');
-  isLoggedIn = this.storedLoginStatus === 'true';
+  loggedInUser: any = null;
+  userEmail: string | null = null;
+  storedLoginStatus: string | null = null;
+  isLoggedIn: boolean = false;
 
   constructor(private http: HttpClient, private router: Router) {}
 
+  ngOnInit(): void {
+    try {
+      this.loggedInUser = sessionStorage.getItem('user');
+      this.userEmail = this.loggedInUser
+        ? JSON.parse(this.loggedInUser).email
+        : null;
+
+      this.storedLoginStatus = sessionStorage.getItem('isLoggedIn');
+      this.isLoggedIn = this.storedLoginStatus === 'true';
+    } catch (error) {
+      console.error('Error accessing session storage:', error);
+    }
+  }
+
   onLogout(): void {
-    sessionStorage.removeItem('isLoggedIn');
-    sessionStorage.removeItem('user');
-    this.isLoggedIn = false;
+    try {
+      sessionStorage.removeItem('isLoggedIn');
+      sessionStorage.removeItem('user');
+      this.isLoggedIn = false;
+    } catch (error) {
+      console.error('Error removing session data:', error);
+    }
 
     window.location.href = '/login';
-
     alert('You have been logged out');
   }
 
